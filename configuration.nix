@@ -119,6 +119,7 @@
 			firefox
 			gnome.gnome-tweaks
 			veracrypt
+			obsidian
 		];
 
 		# Enviroment variables
