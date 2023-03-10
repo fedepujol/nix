@@ -67,33 +67,19 @@ local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
 
-local function root_pattern(...)
-	return require('lspconfig.util').root_pattern(...)
-end
-
-local function build_config()
-	return {
-		on_attach = on_attach,
-		root_pattern = root_pattern,
-		capabilities = capabilities,
-		flags = {
-			debounce_text_changes = 150
-		}
-	}
-end
-
-local config = build_config()
+local root_pattern = require('lspconfig.util').root_pattern
 
 -- Angular LSP
 require('lspconfig').angularls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	root_dir = root_pattern({ '.angular-cli.json', 'angular.json' }),
+	on_attach = on_attach,
+	capabilities = capabilities,
 })
 
 -- Bash LSP
 require('lspconfig').bashls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	cmd_env = {
 		GLOB_PATTERN = '*@(.sh|.inc|.bash|.zsh|.command)',
 	},
@@ -103,8 +89,8 @@ require('lspconfig').bashls.setup({
 
 -- CSS LSP
 require('lspconfig').cssls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	filetypes = { 'css', 'scss', 'less' },
 	settings = {
 		css = {
@@ -115,48 +101,25 @@ require('lspconfig').cssls.setup({
 
 -- Emmet LSP
 require('lspconfig').emmet_ls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
+	root_dir = root_pattern({ '.git', '*.html', '*.css' }),
 	filtypes = { 'html', 'css' },
-	root_dir = config.root_pattern({ '.git', '*.html', '*.css' }),
-})
-
--- Haskell LSP (hls)
--- hie and ghcide were merge into hls
-require('lspconfig').hls.setup({
-	filetypes = { 'haskell', 'lhaskell' },
-	root_dir = config.root_pattern('*.cabal', 'stack.yaml', 'cabal.project', 'package.yaml', 'hie.yaml', '*.hs'),
-	settings = {
-		haskell = {
-			formattinProvider = 'ormolu',
-		},
-	},
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
-	single_file_support = true,
 })
 
 -- HTML LSP
 --Enable (broadcasting) snippet capability for completion
 require('lspconfig').html.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	provideFormatter = true,
 	single_file_support = true
 })
 
 -- JSON LSP
 require('lspconfig').jsonls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
-	root_dir = config.root_pattern({ '.git', vim.fn.getcwd() }),
-	commands = {
-		Format = {
-			function()
-				vim.lsp.buf.range_formatting({}, { 0, 0 }, { vim.fn.line('$'), 0 })
-			end,
-		},
-	},
+	on_attach = on_attach,
+	capabilities = capabilities,
 	settings = {
 		json = {
 			validate = {
@@ -173,31 +136,36 @@ require('lspconfig').jsonls.setup({
 				},
 				{
 					fileMatch = { 'tslint.json' },
-					url = 'https://json.schemastore.org/tsling.json'
+					url = 'https://json.schemastore.org/tslint.json'
 				},
 				{
 					fileMatch = { '.angular-cli.json' },
-					url = 'https://json.schemastore.org/.angular-cli.json'
+					url = 'https://json.schemastore.org/angular-cli.json'
 				},
+				{
+					fileMatch = { 'angular.json' },
+					url = 'https://raw.githubusercontent.com/angular/angular-cli/master/packages/angular/cli/lib/config/workspace-schema.json'
+				},
+				{
+					fileMatch = { '.eslintrc' },
+					url = 'https://json.schemastore.org/eslintrc.json'
+				},
+				{
+					fileMatch = { '.vsconfig ' },
+					url = 'https://json.schemastore.org/vsconfig.json'
+				}
 			}
 		}
 	}
 })
 
--- Lua Lsp
-local runtime_path = vim.split(package.path, ';')
-
-table.insert(runtime_path, 'lua/?.lua')
-table.insert(runtime_path, 'lua/?/init.lua')
-
+-- Lua LSP
 require('lspconfig').sumneko_lua.setup({
 	settings = {
 		Lua = {
 			runtime = {
 				-- Tell the language server which versin of Lua you're using (most likely LuaJIT in the case of Neovim)
-				version = 'LuaJIT',
-				-- Setup your lua path
-				path = runtime_path,
+				version = 'LuaJIT'
 			},
 			diagnostics = {
 				-- Get the language server to recognize the 'vim' global
@@ -206,7 +174,7 @@ require('lspconfig').sumneko_lua.setup({
 			workspace = {
 				-- Make the server aware of Neovim runtime files
 				library = vim.api.nvim_get_runtime_file('', true),
-				checkThirdParty = false
+				checkThirdParty = false,
 			},
 			-- Do not send telemetry data
 			telemetry = {
@@ -214,36 +182,49 @@ require('lspconfig').sumneko_lua.setup({
 			},
 		},
 	},
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 })
 
--- Nix Lsp
+-- Nix LSP
 require('lspconfig').nil_ls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
-	single_file_support = true
+	on_attach = on_attach,
+	capabilities = capabilities,
+	single_file_support = true,
+	settings = {
+		['nil'] = {
+			formatting = {
+				command = { "nixpkgs-fmt" }
+			}
+		}
+	}
 })
 
--- PyLsp
+-- Python LSP
 require('lspconfig').pylsp.setup({
 	filetypes = { 'python' },
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	single_file_support = true,
 })
 
 -- TSServer LSP
 require('lspconfig').tsserver.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	hostInfo = "neovim"
+})
+
+-- Rust LSP
+require('lspconfig').rust_analyzer.setup({
+	on_attach = on_attach,
+	capabilities = capabilities
 })
 
 -- Vim LSP
 require('lspconfig').vimls.setup({
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	on_attach = on_attach,
+	capabilities = capabilities,
 	init_options = {
 		diagnostic = {
 			enable = true,
@@ -265,7 +246,16 @@ require('lspconfig').vimls.setup({
 -- Yaml LSP
 require('lspconfig').yamlls.setup({
 	filetypes = { 'yml', 'yaml' },
-	root_dir = config.root_pattern({ '.git', vim.fn.getcwd() }),
-	on_attach = config.on_attach,
-	capabilities = config.capabilities,
+	root_dir = root_pattern({ '.git', vim.fn.getcwd() }),
+	on_attach = on_attach,
+	capabilities = capabilities,
+	settings = {
+		yaml = {
+			schemas = {
+				['https://raw.githubusercontent.com/compose-spec/compose-spec/master/schema/compose-spec.json'] = 'docker-compose.yml',
+				['https://yarnpkg.com/configuration/yarnrc.json'] = '.yarnrc.yml',
+				['https://json.schemastore.org/yamllint.json'] = 'yamllint',
+			}
+		}
+	}
 })

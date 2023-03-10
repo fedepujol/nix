@@ -21,16 +21,6 @@ let
     };
   };
 
-  heirline = pkgs.vimUtils.buildVimPlugin {
-    name = "heirline";
-    src = pkgs.fetchFromGitHub {
-      owner = "rebelot";
-      repo = "heirline.nvim";
-      rev = "8a8d66122ed05a47910b470ec3361258f6938798";
-      sha256 = "18fbg3ha2yq0sb29pn2wb5v94y29ssqrqa8wq6dxm97s7pgvq6zk";
-    };
-  };
-
   shipwright = pkgs.vimUtils.buildVimPlugin {
     name = "shipwright";
     src = pkgs.fetchFromGitHub {
@@ -41,11 +31,22 @@ let
     };
   };
 
+  heirline-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "heirline-nvim";
+    src = pkgs.fetchFromGitHub {
+      owner = "rebelot";
+      repo = "heirline.nvim";
+      rev = "00f7e271775362792116e252d931590a9344d6a9";
+      sha256 = "1cf9av6h5xdzkvzrmwscld65257syx0mk1czi5gkwg10apyyhfzw";
+    };
+  };
+
 in
 {
   programs = {
     neovim = {
       enable = true;
+      withPython3 = true;
       plugins = with pkgs.vimPlugins; [
         nv-themes
 
@@ -92,8 +93,6 @@ in
         cmp-cmdline
         cmp-vsnip
         vim-vsnip
-        emmet-vim
-
 
         # UI
         {
@@ -111,8 +110,9 @@ in
           type = "lua";
           config = builtins.readFile (./lua/plugins/neo-tree.lua);
         }
+
         {
-          plugin = heirline;
+          plugin = heirline-nvim;
           type = "lua";
           config = builtins.readFile (./lua/plugins/heirline.lua);
         }
@@ -136,32 +136,37 @@ in
 
         # Treesitter
         {
-          plugin = nvim-treesitter;
+          plugin = nvim-treesitter.withPlugins (
+            plugins: with plugins; [
+              tree-sitter-bash
+              tree-sitter-cpp
+              tree-sitter-css
+              tree-sitter-haskell
+              tree-sitter-html
+              tree-sitter-java
+              tree-sitter-json
+              tree-sitter-lua
+              tree-sitter-nix
+              tree-sitter-python
+              tree-sitter-rust
+              tree-sitter-typescript
+              tree-sitter-vim
+              tree-sitter-yaml
+            ]
+          );
           type = "lua";
           config = builtins.readFile (./lua/plugins/tree-sitter.lua);
         }
-        (nvim-treesitter.withPlugins (
-          plugins: with plugins; [
-            tree-sitter-bash
-            tree-sitter-cpp
-            tree-sitter-css
-            tree-sitter-haskell
-            tree-sitter-html
-            tree-sitter-java
-            tree-sitter-json
-            tree-sitter-lua
-            tree-sitter-nix
-            tree-sitter-python
-            tree-sitter-rust
-            tree-sitter-typescript
-            tree-sitter-vim
-            tree-sitter-yaml
-          ]
-        ))
+
         nvim-ts-rainbow
 
         # Editor Features
-        comment-nvim
+        {
+          plugin = comment-nvim;
+          type = "lua";
+          config = builtins.readFile (./lua/plugins/comment.lua);
+        }
+
         {
           plugin = nvim-autopairs;
           type = "lua";
@@ -182,6 +187,24 @@ in
         }
       ];
       extraConfig = builtins.readFile (./init.vim);
+      extraPackages = with pkgs; [
+        tree-sitter
+
+        # Lsp
+        nodePackages.bash-language-server
+        nodePackages.typescript-language-server
+        nodePackages.vim-language-server
+        nodePackages.vscode-langservers-extracted
+        nodePackages.yaml-language-server
+        python310Packages.python-lsp-server
+        nil
+        sumneko-lua-language-server
+        rust-analyzer
+
+        # Formatters
+        nixpkgs-fmt
+        rustfmt
+      ];
     };
   };
 }
