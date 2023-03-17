@@ -138,27 +138,28 @@ in
         {
           plugin = nvim-treesitter.withPlugins (
             plugins: with plugins; [
-              tree-sitter-bash
-              tree-sitter-cpp
-              tree-sitter-css
-              tree-sitter-haskell
-              tree-sitter-html
-              tree-sitter-java
-              tree-sitter-json
-              tree-sitter-lua
-              tree-sitter-nix
-              tree-sitter-python
-              tree-sitter-rust
-              tree-sitter-typescript
-              tree-sitter-vim
-              tree-sitter-yaml
+              bash
+              cpp
+              css
+              haskell
+              help
+              html
+              java
+              json
+              lua
+              nix
+              python
+              rust
+              typescript
+              vim
+              yaml
             ]
           );
           type = "lua";
           config = builtins.readFile (./lua/plugins/tree-sitter.lua);
         }
 
-        nvim-ts-rainbow
+        # nvim-ts-rainbow
 
         # Editor Features
         {
@@ -186,7 +187,7 @@ in
           config = builtins.readFile (./lua/plugins/betterescape.lua);
         }
       ];
-      extraConfig = builtins.readFile (./init.vim);
+      extraLuaConfig = builtins.readFile (./init.lua);
       extraPackages = with pkgs; [
         tree-sitter
 
