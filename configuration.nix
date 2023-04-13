@@ -77,8 +77,8 @@
   programs.zsh = {
     enable = true;
     promptInit = ''
-      			PROMPT='%F{green}%n%f@%F{magenta}%m%f %F{blue}%B%~%b%f %# '
-      		'';
+      PROMPT='%F{green}%n%f@%F{magenta}%m%f %F{blue}%B%~%b%f %# '
+    '';
   };
 
   programs.nano = {
