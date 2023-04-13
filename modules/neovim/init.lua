@@ -32,7 +32,7 @@ vim.opt.writebackup = false -- No backup file
 
 -- Buffer Options
 vim.opt.autoindent = true -- Copy indent from current line when starting a new line
-vim.opt.expandtab = true -- Converts tabs into spaces
+vim.opt.expandtab = false -- Converts tabs into spaces
 vim.opt.fileencoding = 'UTF-8' -- Encoding fot the current buffer. Conversion done with iconv()
 vim.opt.shiftwidth = 4 -- Change number of spaces inserted for indentation
 vim.opt.smartindent = true -- Smart autoindenting when starting a new line
