@@ -1,11 +1,11 @@
 -- Wezterm Config
-local wezterm = require('wezterm')
+local wezterm = require("wezterm")
 local mux = wezterm.mux
 
 local colors = {
-	foreground = '#E5F3FA',
-	background = '#131B25',
-	split = '#2D4F67',
+	foreground = "#E5F3FA",
+	background = "#131B25",
+	split = "#2D4F67",
 	red = "#FF5D62",
 	green = "#95C561",
 	cyan = "#71BAF2",
@@ -21,7 +21,7 @@ local colors = {
 	black2 = "#3A3432",
 }
 
-local process_name = function(tab)
+local process_icon = function(tab)
 	local icon = {
 		["zsh"] = {
 			{ Foreground = { Color = colors.yellow } },
@@ -39,44 +39,47 @@ local process_name = function(tab)
 		},
 		["ssh"] = {
 			{ Text = wezterm.nerdfonts.fa_server },
-		}
+		},
 	}
 
 	local name = string.gsub(tab.active_pane.foreground_process_name, "(.*[/\\])(.*)", "%2")
 	return wezterm.format(icon[name] or {
 		{ Forground = { Color = colors.split } },
-		{ Text = string.format("[%s]", name) }
+		{ Text = string.format("[%s]", name) },
 	})
 end
 
-local cwd = function(tab)
+local basename = function(tab)
 	local dir = tab.active_pane.current_working_dir
-	return string.format("  %s ", string.gsub(dir, "(.*[/\\])(.*)", "%2"))
+	local base = string.gsub(dir, "(.*[/\\])(.*)", "%2")
+
+	base = base == os.getenv("USER") and "home" or base
+	return string.format("  %s ", base)
 end
 
-wezterm.on('gui-startup', function(cmd)
+wezterm.on("gui-startup", function(cmd)
 	local _, _, window = mux.spawn_window(cmd or {})
 	window:gui_window():maximize()
 end)
 
-wezterm.on('format-tab-title', function(tab)
+wezterm.on("format-tab-title", function(tab)
 	return wezterm.format({
 		{ Attribute = { Intensity = "Half" } },
-		{ Text = string.format(' %s: ', tab.tab_index) },
+		{ Text = string.format(" %s: ", tab.tab_index) },
 		"ResetAttributes",
-		{ Text = process_name(tab) },
+		{ Text = process_icon(tab) },
 		{ Text = " " },
-		{ Text = cwd(tab) },
-		{ Text = " |" }
+		{ Text = basename(tab) },
+		{ Text = " |" },
 	})
 end)
 
 return {
 	-- Font
 	font = wezterm.font_with_fallback({
-		'FiraCode Nerd Font',
-		'JetBrains Mono',
-		'Ubuntu Nerd Font',
+		"FiraCode Nerd Font",
+		"JetBrains Mono",
+		"Ubuntu Nerd Font",
 	}),
 	font_size = 11,
 	warn_about_missing_glyps = false,
@@ -86,6 +89,7 @@ return {
 	show_new_tab_button_in_tab_bar = false,
 	use_fancy_tab_bar = false,
 	tab_bar_at_bottom = true,
+	tab_max_width = 25,
 
 	-- Updates
 	show_update_window = false,
@@ -126,14 +130,14 @@ return {
 			active_tab = {
 				bg_color = colors.background,
 				fg_color = colors.foreground,
-				underline = 'None',
+				underline = "None",
 				italic = false,
-				strikethrough = false
+				strikethrough = false,
 			},
 			inactive_tab = {
 				bg_color = colors.black2,
-				fg_color = colors.grey2
-			}
-		}
-	}
+				fg_color = colors.grey2,
+			},
+		},
+	},
 }
