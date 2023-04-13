@@ -43,6 +43,13 @@ local border = {
 	{ '│', 'FloatBorder' },
 }
 
+local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+
+for type, icon in pairs(signs) do
+	local hl = "DiagnosticSign" .. type
+	vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+end
+
 -- Handlers
 vim.lsp.diagnostic.config = {
 	virtual_text = true,
@@ -63,9 +70,7 @@ function vim.lsp.util.open_floating_preview(contents, syntax, opts, ...)
 	return orig_util_open_floating_preview(contents, syntax, opts, ...)
 end
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities.textDocument.completion.completionItem.snippetSupport = true
-capabilities = require('cmp_nvim_lsp').default_capabilities(capabilities)
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 local root_pattern = require('lspconfig.util').root_pattern
 
@@ -182,6 +187,12 @@ require('lspconfig').sumneko_lua.setup({
 			},
 		},
 	},
+	on_attach = on_attach,
+	capabilities = capabilities,
+})
+
+-- Marksman LSP
+require('lspconfig').marksman.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
 })

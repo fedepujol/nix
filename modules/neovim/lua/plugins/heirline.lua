@@ -1,36 +1,36 @@
 -- Custom Providers
 local M = {}
 
-local white = '#FFFFFF'
-local black0 = '#000000'
-local black3 = '#161616'
-local blue1 = '#1565C0'
-local green0 = '#247B22'
-local gray1 = '#808080'
-local gray3 = '#B1B1B1'
-local gray5 = '#D8D8D8'
-local gray6 = '#E2E2E2'
-local red3 = '#EB0000'
-local red7 = '#FF3B3B'
-local yellow1 = '#9D9D00'
-local purple3 = '#800080'
-local orange0 = '#764C00'
-local orange4 = '#FFAC14'
-local orange5 = '#FFB327'
+local white = "#FFFFFF"
+local black0 = "#000000"
+local black3 = "#161616"
+local blue1 = "#1565C0"
+local green0 = "#247B22"
+local gray1 = "#808080"
+local gray3 = "#B1B1B1"
+local gray5 = "#D8D8D8"
+local gray6 = "#E2E2E2"
+local red3 = "#EB0000"
+local red7 = "#FF3B3B"
+local yellow1 = "#9D9D00"
+local purple3 = "#800080"
+local orange0 = "#764C00"
+local orange4 = "#FFAC14"
+local orange5 = "#FFB327"
 
 M.mode_aliases = {
-	[19] = { alias = 'SBK', color = { fg = black0, bg = gray5 } },
-	[22] = { alias = 'VBK', color = { fg = black0, bg = orange5 } },
-	[82] = { alias = 'RPL', color = { fg = white, bg = red3 } },
-	[83] = { alias = 'SLN', color = { fg = black0, bg = gray3 } },
-	[86] = { alias = 'VLN', color = { fg = black0, bg = orange4 } },
-	[99] = { alias = 'CMD', color = { fg = white, bg = purple3 } },
-	[105] = { alias = 'INS', color = { fg = white, bg = green0 } },
-	[110] = { alias = 'NML', color = { fg = white, bg = blue1 } },
-	[114] = { alias = 'OPP', color = { fg = black0, bg = gray6 } },
-	[115] = { alias = 'SCT', color = { fg = black0, bg = gray1 } },
-	[116] = { alias = 'TRM', color = { fg = black0, bg = yellow1 } },
-	[118] = { alias = 'VSL', color = { fg = white, bg = orange0 } },
+	[19] = { alias = "SBK", color = { fg = black0, bg = gray5 } },
+	[22] = { alias = "VBK", color = { fg = black0, bg = orange5 } },
+	[82] = { alias = "RPL", color = { fg = white, bg = red3 } },
+	[83] = { alias = "SLN", color = { fg = black0, bg = gray3 } },
+	[86] = { alias = "VLN", color = { fg = black0, bg = orange4 } },
+	[99] = { alias = "CMD", color = { fg = white, bg = purple3 } },
+	[105] = { alias = "INS", color = { fg = white, bg = green0 } },
+	[110] = { alias = "NML", color = { fg = white, bg = blue1 } },
+	[114] = { alias = "OPP", color = { fg = black0, bg = gray6 } },
+	[115] = { alias = "SCT", color = { fg = black0, bg = gray1 } },
+	[116] = { alias = "TRM", color = { fg = black0, bg = yellow1 } },
+	[118] = { alias = "VSL", color = { fg = white, bg = orange0 } },
 }
 
 local getCurrentMode = function()
@@ -38,7 +38,7 @@ local getCurrentMode = function()
 	if cMode == nil then
 		-- If mode is not mapped, show the mode() and the byte convertion
 		cMode = {
-			alias = vim.fn.mode() .. ' ' .. vim.fn.mode():byte(),
+			alias = vim.fn.mode() .. " " .. vim.fn.mode():byte(),
 			color = { fg = white, bg = red7 },
 		}
 	end
@@ -54,21 +54,21 @@ M.getModeColor = function()
 end
 
 M.position = function()
-	return ' ' .. string.format('%02d.%02d', unpack(vim.api.nvim_win_get_cursor(0))) .. ' '
+	return " " .. string.format("%02d.%02d", unpack(vim.api.nvim_win_get_cursor(0))) .. " "
 end
 
 -- Heirline
-local conditions = require('heirline.conditions')
-local utils = require('heirline.utils')
-local ndIcons = require('nvim-web-devicons')
+local conditions = require("heirline.conditions")
+local utils = require("heirline.utils")
+local ndIcons = require("nvim-web-devicons")
 
-local Align = { provider = '%=' }
-local Space = { provider = ' ' }
+local Align = { provider = "%=" }
+local Space = { provider = " " }
 
 -- ViMode
 local ViMode = {
 	provider = function()
-		return ' ' .. M.getModeAlias()
+		return " " .. M.getModeAlias()
 	end,
 	hl = function()
 		return {
@@ -76,118 +76,153 @@ local ViMode = {
 			bg = black3,
 		}
 	end,
-	update = { 'ModeChanged' },
+	update = { "ModeChanged" },
 }
 
-ViMode = utils.surround({ '', '' }, black3, { ViMode })
+ViMode = utils.surround({ "", "" }, black3, { ViMode })
 
 local FileNameBlock = {
 	init = function(self)
 		self.filename = vim.api.nvim_buf_get_name(0)
-	end
+	end,
+}
+
+local FolderIcon = {
+	provider = " ",
+	hl = { fg = utils.get_highlight("Directory").fg },
 }
 
 local FileName = {
-	provider = function(self)
-		return vim.fn.fnamemodify(self.filename, ':t')
-	end
+	init = function(self)
+		self.lfilename = vim.fn.fnamemodify(self.filename, ":.")
+		if self.lfilename == "" then
+			self.lfilename = "[Undefined]"
+		end
+	end,
+	flexible = 2,
+	{
+		provider = function(self)
+			return vim.fn.pathshorten(self.lfilename)
+		end,
+	},
+	{
+		provider = function(self)
+			return vim.fn.fnamemodify(self.filename, ":t")
+		end,
+	},
 }
 
 local FileIcon = {
-	init = function(self)
-		local filename = self.filename
-		local extension = vim.fn.fnamemodify(filename, ':e')
-		self.icon, self.icon_color = ndIcons.get_icon_color(filename, extension, { default = true })
+	provider = function()
+		local filename = vim.api.nvim_buf_get_name(0)
+		local extension = vim.fn.fnamemodify(filename, ":e")
+		local icon, _ = ndIcons.get_icon_color(filename, extension, { default = true })
+		return icon
 	end,
-	provider = function(self)
-		return self.icon and (self.icon)
-	end,
-	hl = function(self)
-		return { fg = self.icon_color }
+	hl = function()
+		local filename = vim.api.nvim_buf_get_name(0)
+		local extension = vim.fn.fnamemodify(filename, ":e")
+		local _, icon_color = ndIcons.get_icon_color(filename, extension, { default = true })
+		return { fg = icon_color }
 	end,
 }
 
-FileNameBlock = utils.insert(FileNameBlock, FileIcon, Space, FileName)
+FileNameBlock = utils.insert(FileNameBlock, FolderIcon, FileName, { provider = "%<" })
 
 -- Git
 local Git = {
 	condition = conditions.is_git_repo,
 	init = function(self)
 		self.status_dict = vim.b.gitsigns_status_dict
-		self.has_changes = self.status_dict.added ~= 0
-			or self.status_dict.removed ~= 0
-			or self.status_dict.changed ~= 0
+		self.has_changes = self.status_dict.added ~= 0 or
+			self.status_dict.removed ~= 0 or self.status_dict.changed ~= 0
 	end,
-	{ flexible = 2, {
-		provider = function(self)
-			return ' ' .. self.status_dict.head .. ' '
-		end,
-		hl = { fg = utils.get_highlight('PreProc').fg },
-	}, {
-		provider = function()
-			return ' '
-		end,
-		hl = { fg = utils.get_highlight('PreProc').fg },
-	} },
-	{ flexible = 2, {
-		provider = function(self)
-			local count = self.status_dict.added or 0
-			return count > 0 and (' ' .. count) .. ' '
-		end,
-		hl = { fg = utils.get_highlight('GitSignsAdd').fg },
-	}, {
-		provider = function(self)
-			local count = self.status_dict.added or 0
-			return count > 0 and '● '
-		end,
-		hl = { fg = utils.get_highlight('GitSignsAdd').fg },
-	} },
-	{ flexible = 2, {
-		provider = function(self)
-			local count = self.status_dict.removed or 0
-			return count > 0 and (' ' .. count) .. ' '
-		end,
-		hl = { fg = utils.get_highlight('GitSignsChange').fg },
-	}, {
-		provider = function(self)
-			local count = self.status_dict.removed or 0
-			return count > 0 and '● '
-		end,
-		hl = { fg = utils.get_highlight('GitSignsChange').fg },
-	} },
-	{ flexible = 2, {
-		provider = function(self)
-			local count = self.status_dict.changed or 0
-			return count > 0 and (' ' .. count)
-		end,
-		hl = { fg = utils.get_highlight('GitSignsDelete').fg },
-	}, {
-		provider = function(self)
-			local count = self.status_dict.changed or 0
-			return count > 0 and '●'
-		end,
-		hl = { fg = utils.get_highlight('GitSignsDelete').fg },
-	} },
+	{
+		flexible = 2,
+		{
+			provider = function(self)
+				return " " .. self.status_dict.head .. " "
+			end,
+			hl = { fg = utils.get_highlight("PreProc").fg },
+		},
+		{
+			provider = function()
+				return " "
+			end,
+			hl = { fg = utils.get_highlight("PreProc").fg },
+		},
+	},
+	{
+		flexible = 2,
+		{
+			provider = function(self)
+				local count = self.status_dict.added or 0
+				return count > 0 and (" " .. count) .. " "
+			end,
+			hl = { fg = utils.get_highlight("GitSignsAdd").fg },
+		},
+		{
+			provider = function(self)
+				local count = self.status_dict.added or 0
+				return count > 0 and "● "
+			end,
+			hl = { fg = utils.get_highlight("GitSignsAdd").fg },
+		},
+	},
+	{
+		flexible = 2,
+		{
+			provider = function(self)
+				local count = self.status_dict.removed or 0
+				return count > 0 and (" " .. count) .. " "
+			end,
+			hl = { fg = utils.get_highlight("GitSignsChange").fg },
+		},
+		{
+			provider = function(self)
+				local count = self.status_dict.removed or 0
+				return count > 0 and "● "
+			end,
+			hl = { fg = utils.get_highlight("GitSignsChange").fg },
+		},
+	},
+	{
+		flexible = 2,
+		{
+			provider = function(self)
+				local count = self.status_dict.changed or 0
+				return count > 0 and (" " .. count)
+			end,
+			hl = { fg = utils.get_highlight("GitSignsDelete").fg },
+		},
+		{
+			provider = function(self)
+				local count = self.status_dict.changed or 0
+				return count > 0 and "●"
+			end,
+			hl = { fg = utils.get_highlight("GitSignsDelete").fg },
+		},
+	},
 }
 
-local GitBlock = utils.insert(Git, { provider = '%<' })
+local GitBlock = utils.insert(Git, { provider = "%<" })
 
 -- Lsp
 local LSPBlock = {}
 
 local Lsp = {
 	condition = conditions.lsp_attached,
-	update = { 'LspAttach', 'LspDetach' },
+	update = { "LspAttach", "LspDetach" },
 	-- provider = ' [LSP]',
 	provider = function()
 		local names = {}
 		for _, server in pairs(vim.lsp.get_active_clients({ bufnr = 0 })) do
 			table.insert(names, server.name)
 		end
-		return ' [' .. table.concat(names, " ") .. ']'
+		return " [" .. table.concat(names, " ") .. "]"
 	end,
 	hl = {
-		fg = utils.get_highlight('Type').fg,
+		fg = utils.get_highlight("Type").fg,
 	},
 }
 
@@ -195,10 +230,10 @@ local Lsp = {
 local Diagnostics = {
 	condition = conditions.has_diagnostics,
 	static = {
-		error_icon = ' ',
-		warn_icon = ' ',
-		info_icon = ' ',
-		hint_icon = ' ',
+		error_icon = " ",
+		warn_icon = " ",
+		info_icon = " ",
+		hint_icon = " ",
 	},
 	init = function(self)
 		self.errors = #vim.diagnostic.get(0, { severity = vim.diagnostic.severity.ERROR })
@@ -208,88 +243,68 @@ local Diagnostics = {
 	end,
 	{
 		provider = function(self)
-			return self.errors > 0 and (self.error_icon .. self.errors .. ' ')
+			return self.errors > 0 and (self.error_icon .. self.errors .. " ")
 		end,
-		hl = { fg = utils.get_highlight('DiagnosticError').fg },
+		hl = { fg = utils.get_highlight("DiagnosticError").fg },
 	},
 	{
 		provider = function(self)
-			return self.warnings > 0 and (self.warn_icon .. self.warnings .. ' ')
+			return self.warnings > 0 and (self.warn_icon .. self.warnings .. " ")
 		end,
-		hl = { fg = utils.get_highlight('DiagnosticWarn').fg },
+		hl = { fg = utils.get_highlight("DiagnosticWarn").fg },
 	},
 	{
 		provider = function(self)
-			return self.info > 0 and (self.info_icon .. self.info .. ' ')
+			return self.info > 0 and (self.info_icon .. self.info .. " ")
 		end,
-		hl = { fg = utils.get_highlight('DiagnosticInfo').fg },
+		hl = { fg = utils.get_highlight("DiagnosticInfo").fg },
 	},
 	{
 		provider = function(self)
-			return self.hints > 0 and (self.hint_icon .. self.hints .. ' ')
+			return self.hints > 0 and (self.hint_icon .. self.hints .. " ")
 		end,
-		hl = { fg = utils.get_highlight('DiagnosticHint').fg },
+		hl = { fg = utils.get_highlight("DiagnosticHint").fg },
 	},
 }
 
-LSPBlock = utils.insert(LSPBlock, Lsp, Space, Diagnostics, { provider = '%<' })
+LSPBlock = utils.insert(LSPBlock, Lsp, Space, Diagnostics, { provider = "%<" })
 
 local FileIndent = {
 	provider = function()
-		local res = ''
+		local res = ""
 		if not vim.bo.expandtab then
-			res = 'Tab Size: ' .. vim.bo.shiftwidth
+			res = "TAB: " .. vim.bo.shiftwidth
 		else
-			res = 'Spaces: ' .. vim.bo.shiftwidth
+			res = "SPC: " .. vim.bo.shiftwidth
 		end
 		return res
 	end,
-	hl = { fg = utils.get_highlight('Boolean').fg },
+	hl = { fg = utils.get_highlight("Boolean").fg },
 }
 
 -- FileEncodig
 local FileEncoding = {
 	provider = function()
-		local enc = (vim.bo.fenc ~= '' and vim.bo.fenc) or vim.o.enc
+		local enc = (vim.bo.fenc ~= "" and vim.bo.fenc) or vim.o.enc
 		return enc:upper()
 	end,
-	hl = { fg = utils.get_highlight('Number').fg }
+	hl = { fg = utils.get_highlight("Number").fg },
 }
 
 local FileFormat = {
 	provider = function()
-		local res = ''
+		local res = ""
 		local fmt = vim.bo.fileformat
-		if fmt == 'unix' then
-			res = ' ' .. fmt:upper()
-		elseif fmt == 'dos' then
-			res = ' ' .. fmt:upper()
+		if fmt == "unix" then
+			res = " "
+		elseif fmt == "dos" then
+			res = " "
 		else
-			res = ' ' .. fmt:upper()
+			res = " "
 		end
 		return res
 	end,
-	hl = { fg = utils.get_highlight('Character').fg }
-}
-
--- File Size
-local FileSize = {
-	condition = function()
-		return vim.api.nvim_buf_get_name(0) ~= ''
-	end,
-	provider = function()
-		local i = 1
-		local suffix = { 'b', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb', 'Eb' }
-		local fSize = vim.fn.getfsize(vim.api.nvim_buf_get_name(0))
-
-		fSize = (fSize < 0 and 0) or fSize
-		while fSize >= 1024 do
-			fSize = fSize / 1024
-			i = i + 1
-		end
-
-		return string.format('%.2g%s', fSize, suffix[i])
-	end,
+	hl = { fg = utils.get_highlight("Number").fg },
 }
 
 local FileType = {
@@ -300,30 +315,30 @@ local FileType = {
 
 -- Cursor Position
 local Ruler = {
-	provider = ' %2l:%2c',
+	provider = " %2l:%2c",
 	hl = {
-		fg = utils.get_highlight('Special').fg,
+		fg = utils.get_highlight("Special").fg,
 	},
 }
 
 local Percentage = {
 	provider = function()
-		local cL = vim.fn.line('.')
-		local tL = vim.fn.line('$')
+		local cL = vim.fn.line(".")
+		local tL = vim.fn.line("$")
 
 		if cL == 1 then
-			return ' Top'
+			return " Top"
 		elseif cL == tL then
-			return ' Bot'
+			return " Bot"
 		end
 
 		local result, _ = math.modf((cL / tL) * 100)
-		local percentage = string.format('%02d', result)
+		local percentage = string.format("%02d", result)
 
-		return ' ' .. percentage .. '%%'
+		return " " .. percentage .. "%%"
 	end,
 	hl = {
-		fg = utils.get_highlight('StorageClass').fg,
+		fg = utils.get_highlight("StorageClass").fg,
 	},
 }
 
@@ -331,32 +346,36 @@ local TerminalName = {
 	provider = function()
 		local tName = vim.api.nvim_buf_get_name(0)
 		-- Remove Prefix
-		tName = string.gsub(tName, '.*/%d+:', '')
+		tName = string.gsub(tName, ".*/%d+:", "")
 		-- Remove Suffix
-		tName = string.gsub(tName, '&.*', '')
-		return ' ' .. string.sub(tName, 1, 1):upper() .. string.sub(tName, 2)
+		tName = string.gsub(tName, "&.*", "")
+		return " " .. string.sub(tName, 1, 1):upper() .. string.sub(tName, 2)
 	end,
 }
 
 -- Config
 local MainLine = {
+	-- Right
 	ViMode,
 	Space,
 	GitBlock,
 	Space,
 	FileNameBlock,
 	Space,
-	FileType,
-	Space,
-	FileSize,
 	Align,
+
+	-- Center
 	LSPBlock,
 	Align,
+
+	-- Left
+	FileIcon,
 	Space,
-	FileFormat,
+	FileType,
 	Space,
 	FileIndent,
 	Space,
+	FileFormat,
 	FileEncoding,
 	Space,
 	Ruler,
@@ -368,8 +387,8 @@ local MainLine = {
 local SpecialLine = {
 	condition = function()
 		return conditions.buffer_matches({
-			buftype = { 'nofile', 'help', 'quickfix' },
-			filetype = { '^git.*', 'fugitive' },
+			buftype = { "nofile", "help", "quickfix" },
+			filetype = { "^git.*", "fugitive" },
 		}) or (not conditions.is_active())
 	end,
 	ViMode,
@@ -381,7 +400,7 @@ local SpecialLine = {
 local TerminalLine = {
 	condition = function()
 		return conditions.buffer_matches({
-			buftype = { 'terminal' },
+			buftype = { "terminal" },
 		})
 	end,
 	ViMode,
@@ -398,13 +417,13 @@ local StatusLines = {
 	hl = function()
 		if conditions.is_active() then
 			return {
-				fg = utils.get_highlight('StatusLine').fg,
-				bg = utils.get_highlight('StatusLine').bg,
+				fg = utils.get_highlight("StatusLine").fg,
+				bg = utils.get_highlight("StatusLine").bg,
 			}
 		else
 			return {
-				fg = utils.get_highlight('StatusLineNC').fg,
-				bg = utils.get_highlight('StatusLineNC').bg,
+				fg = utils.get_highlight("StatusLineNC").fg,
+				bg = utils.get_highlight("StatusLineNC").bg,
 			}
 		end
 	end,
@@ -414,13 +433,13 @@ local StatusLines = {
 	MainLine,
 }
 
-vim.api.nvim_create_augroup('Heirline', { clear = true })
-vim.api.nvim_create_autocmd('ColorScheme', {
+vim.api.nvim_create_augroup("Heirline", { clear = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
 	callback = function()
-		require('heirline').reset_highlights()
+		require("heirline").reset_highlights()
 	end,
 })
 
-require('heirline').setup({
-	statusline = StatusLines
+require("heirline").setup({
+	statusline = StatusLines,
 })
