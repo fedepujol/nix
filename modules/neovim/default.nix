@@ -67,6 +67,20 @@ in
         nvim-code-action-menu
         fidget-nvim
 
+        # Formatter
+        {
+          plugin = formatter-nvim;
+          type = "lua";
+          config = builtins.readFile (./lua/plugins/formatter.lua);
+        }
+
+        # Linter
+        {
+          plugin = nvim-lint;
+          type = "lua";
+          config = builtins.readFile (./lua/plugins/lint.lua);
+        }
+
         # Icons
         nvim-web-devicons
 
@@ -136,30 +150,12 @@ in
 
         # Treesitter
         {
-          plugin = nvim-treesitter.withPlugins (
-            plugins: with plugins; [
-              bash
-              cpp
-              css
-              haskell
-              help
-              html
-              java
-              json
-              lua
-              nix
-              python
-              rust
-              typescript
-              vim
-              yaml
-            ]
-          );
+          plugin = nvim-treesitter.withAllGrammars;
           type = "lua";
           config = builtins.readFile (./lua/plugins/tree-sitter.lua);
         }
 
-        # nvim-ts-rainbow
+        nvim-ts-rainbow
 
         # Editor Features
         {
@@ -191,20 +187,28 @@ in
       extraPackages = with pkgs; [
         tree-sitter
 
-        # Lsp
+        # Lsp's
+        marksman
+        nil
         nodePackages.bash-language-server
         nodePackages.typescript-language-server
         nodePackages.vim-language-server
         nodePackages.vscode-langservers-extracted
         nodePackages.yaml-language-server
         python310Packages.python-lsp-server
-        nil
-        sumneko-lua-language-server
         rust-analyzer
+        sumneko-lua-language-server
 
-        # Formatters
+        # Formatter's
         nixpkgs-fmt
+        nodePackages.prettier
         rustfmt
+        stylua
+
+        # Linter's
+        nodePackages.markdownlint-cli
+        shellcheck
+        yamllint
       ];
     };
   };
