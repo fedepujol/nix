@@ -82,7 +82,7 @@ return {
 		"Ubuntu Nerd Font",
 	}),
 	font_size = 11,
-	warn_about_missing_glyps = false,
+	warn_about_missing_glyphs = false,
 
 	-- Tabs
 	hide_tab_bar_if_only_one_tab = true,
@@ -96,7 +96,7 @@ return {
 	check_for_updates = false,
 
 	-- Other Config
-	exit_behaviour = "Close",
+	exit_behavior = "Close",
 	audible_bell = "Disabled",
 	automatically_reload_config = true,
 
