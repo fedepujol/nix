@@ -11,6 +11,9 @@
   ];
 
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.permittedInsecurePackages = [
+    "electron-21.4.0"
+  ];
 
   boot = {
     # Use the systemd-boot EFI boot loader
@@ -95,8 +98,8 @@
     shell = pkgs.zsh;
   };
 
-  # Users default-shell bash
-  users.defaultUserShell = pkgs.bash;
+  # Users default-shell zsh
+  users.defaultUserShell = pkgs.zsh;
 
   # List packages default
   environment = {
