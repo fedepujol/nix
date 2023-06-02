@@ -11,13 +11,13 @@ let
     };
   };
 
-  nv-themes = pkgs.vimUtils.buildVimPlugin {
-    name = "nv-themes";
+  cosmos-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "cosmos-nvim";
     src = pkgs.fetchFromGitHub {
       owner = "fedepujol";
-      repo = "nv-themes";
-      rev = "54ea65615605024409d094bfa64eabff9c30f2b1";
-      sha256 = "1vz3lg5zdhd8bkqcpmr07xz5paz7ckmfvgsbpklj6rr40zclsvb7";
+      repo = "cosmos.nvim";
+      rev = "2f68ef50bda517e45f9207f26b1a2911cea02cf9";
+      sha256 = "1kf01b8399rc09rvl7rnixfqia0q4l39izpk0hw48rrjyb3qgnic";
     };
   };
 
@@ -31,13 +31,13 @@ let
     };
   };
 
-  heirline-nvim = pkgs.vimUtils.buildVimPlugin {
-    name = "heirline-nvim";
+  nerdicons-nvim = pkgs.vimUtils.buildVimPlugin {
+    name = "nerdicons";
     src = pkgs.fetchFromGitHub {
-      owner = "rebelot";
-      repo = "heirline.nvim";
-      rev = "00f7e271775362792116e252d931590a9344d6a9";
-      sha256 = "1cf9av6h5xdzkvzrmwscld65257syx0mk1czi5gkwg10apyyhfzw";
+      owner = "nvimdev";
+      repo = "nerdicons.nvim";
+      rev = "6dfb8abaf278f6075605902f5e79b8fef9403b3b";
+      sha256 = "11gbf28x2f4cywxgqdmdn6r4m050crj43mzvymaadrsbfy863hyc";
     };
   };
 
@@ -48,9 +48,9 @@ in
       enable = true;
       withPython3 = true;
       plugins = with pkgs.vimPlugins; [
-        nv-themes
+        cosmos-nvim
 
-        # Neodev
+        # Dev Specific
         {
           plugin = neodev-nvim;
           type = "lua";
@@ -64,7 +64,6 @@ in
           config = builtins.readFile (./lua/plugins/lspconfig.lua);
         }
         emmet-vim
-        nvim-code-action-menu
         fidget-nvim
 
         # Formatter
@@ -83,6 +82,11 @@ in
 
         # Icons
         nvim-web-devicons
+        {
+          plugin = nerdicons-nvim;
+          type = "lua";
+          config = builtins.readFile (./lua/plugins/nerdicons.lua);
+        }
 
         # Colors
         {
@@ -170,7 +174,7 @@ in
           config = builtins.readFile (./lua/plugins/autopairs.lua);
         }
 
-        # Keys
+        # Motions
         move-nvim
         {
           plugin = which-key-nvim;
