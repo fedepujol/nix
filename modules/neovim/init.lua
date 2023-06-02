@@ -51,7 +51,7 @@ vim.opt.wrap = false -- Display long lines as such
 
 vim.cmd('filetype plugin indent on')
 
-vim.cmd(':colo nv-cosmos')
+vim.cmd(':colo cosmos')
 
 -- General Mappings
 local opts = { noremap = true, silent = true }
