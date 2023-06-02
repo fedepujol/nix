@@ -4,15 +4,6 @@ require('which-key').setup({
 		spelling = {
 			enable = false,
 		},
-		presets = {
-			operators = false,
-			motions = true,
-			text_objects = true,
-			widnows = true,
-			nav = true,
-			z = true,
-			g = true,
-		},
 	},
 	key_labels = {
 		['<space>'] = 'SPC',
@@ -21,11 +12,8 @@ require('which-key').setup({
 		['<leader>'] = 'LEAD',
 	},
 	window = {
-		border = 'none',
-		position = 'bottom',
+		border = 'single',
 	},
-	show_help = true,
-	hidden = { '<silent>', '<cmd>', '<CMD>', '<CR>', 'lua', '^:' },
 })
 
 local wk = require('which-key')

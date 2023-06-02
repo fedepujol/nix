@@ -33,18 +33,10 @@ require('telescope').setup({
 	},
 })
 
--- require('telescope').load_extension('fzf')
-
-local opts = { noremap = true }
-
--- File Search
-vim.api.nvim_set_keymap('n', '<C-p>', "<CMD>lua require('telescope.builtin').find_files({previewer = false})<CR>", opts)
-
 wk.register({
 	name = 'Find',
 	b = { '<cmd>lua require("telescope.builtin").buffers()<CR>', 'Buffers' },
-	c = { '<cmd>:Telescope commands<CR>', 'Commands' },
 	g = { '<cmd>lua require("telescope.builtin").live_grep()<CR>', 'Live Grep' },
 	h = { '<cmd>lua require("telescope.builtin").help_tags()<CR>', 'Help Tags' },
-	o = { '<cmd>lua require("telescope.builtin").oldfiles()<CR>', 'Old files' },
-}, { mode = 'n', prefix = '<C-f>', noremap = true, silent = true })
+	p = { "<CMD>lua require('telescope.builtin').find_files({previewer = false})<CR>", 'Open File' }
+}, { mode = 'n', prefix = '<leader>f', noremap = true, silent = true })

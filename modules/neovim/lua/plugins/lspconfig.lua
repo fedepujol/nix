@@ -85,18 +85,12 @@ require('lspconfig').angularls.setup({
 require('lspconfig').bashls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	cmd_env = {
-		GLOB_PATTERN = '*@(.sh|.inc|.bash|.zsh|.command)',
-	},
-	filetypes = { 'sh', 'zsh' },
-	single_file_support = true
 })
 
 -- CSS LSP
 require('lspconfig').cssls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	filetypes = { 'css', 'scss', 'less' },
 	settings = {
 		css = {
 			validate = true,
@@ -117,8 +111,6 @@ require('lspconfig').emmet_ls.setup({
 require('lspconfig').html.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	provideFormatter = true,
-	single_file_support = true
 })
 
 -- JSON LSP
@@ -165,7 +157,7 @@ require('lspconfig').jsonls.setup({
 })
 
 -- Lua LSP
-require('lspconfig').sumneko_lua.setup({
+require('lspconfig').lua_ls.setup({
 	settings = {
 		Lua = {
 			runtime = {
@@ -201,7 +193,6 @@ require('lspconfig').marksman.setup({
 require('lspconfig').nil_ls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	single_file_support = true,
 	settings = {
 		['nil'] = {
 			formatting = {
@@ -213,17 +204,14 @@ require('lspconfig').nil_ls.setup({
 
 -- Python LSP
 require('lspconfig').pylsp.setup({
-	filetypes = { 'python' },
 	on_attach = on_attach,
 	capabilities = capabilities,
-	single_file_support = true,
 })
 
 -- TSServer LSP
 require('lspconfig').tsserver.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	hostInfo = "neovim"
 })
 
 -- Rust LSP
@@ -236,28 +224,10 @@ require('lspconfig').rust_analyzer.setup({
 require('lspconfig').vimls.setup({
 	on_attach = on_attach,
 	capabilities = capabilities,
-	init_options = {
-		diagnostic = {
-			enable = true,
-		},
-		indexes = {
-			count = 3,
-			gap = 100,
-			projectRootPatterns = { 'runtime', 'nvim', '.git', 'autoload', 'plugin' },
-			runtimepath = true,
-		},
-		isNeovim = true,
-		suggest = {
-			fromRuntimepath = true,
-			fromVimruntime = true,
-		},
-	},
 })
 
 -- Yaml LSP
 require('lspconfig').yamlls.setup({
-	filetypes = { 'yml', 'yaml' },
-	root_dir = root_pattern({ '.git', vim.fn.getcwd() }),
 	on_attach = on_attach,
 	capabilities = capabilities,
 	settings = {
